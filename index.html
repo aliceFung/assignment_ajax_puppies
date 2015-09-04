@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Puppies Shelter</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <link rel="stylesheet" href="stylesheets/styles.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src = "script.js"></script>
+</head>
+<body class = "container">
+
+  <div id = "flash" class="hidden alert alert-warning"></div>
+
+  <div class="row">
+    <div class = "col-md-12 text-center">
+      <h1>The Ajax Puppy Shelter</h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-6 col-md-offset-3 text-center">
+      <h2>Register a new puppy</h2>
+
+      <form>
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" name="name" placeholder="Puppy Name" class = "form-control">
+        </div>
+
+        <div class="form-group">
+          <label>Breed</label>
+          <select class = "form-control" id = "breed" name = "breed">
+          </select>
+        </div>
+
+        <div class="form-group">
+          <input type = "submit" class="btn btn-primary btn-lg btn-block" value="Register Puppy">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class = "col-md-8 col-md-offset-2">
+      <h2>Our puppies</h2>
+
+      <a href="#" id="refresh">Refresh puppies list</a>
+
+      <ul id = "puppies-list">
+        
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>
