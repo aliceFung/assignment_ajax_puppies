@@ -47,6 +47,7 @@ PUPPY.ajaxRefresher = (function () {
 
   var getPuppyInfo = function (jsonArr) {
     var filteredInfo = {};
+    jsonArr.reverse();
     for(var i=0; i < jsonArr.length; i++){
       filteredInfo[jsonArr[i].name]= { breed: jsonArr[i].breed.name,
                                       found: jsonArr[i].created_at,
@@ -93,15 +94,15 @@ PUPPY.ajaxRefresher = (function () {
     $.ajax({
       method: "POST",
       url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
-      data: {breed_id: breedVal, name: puppyName},
+      data: JSON.stringify({breed_id: breedVal, name: puppyName}),
       dataType: "json",
       contentType: "application/json",
-      headers: { 'Access-Control-Allow-Origin': '*'},
+      headers: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
       type: "POST",
       async: true,
       success: function(jsonArr) {
         showSuccessAlert('Puppy is ready for adoption');
-        addNewPuppy(jsonArr);
+        getPuppiesList();
       },
 
       error: function(xhr, status, errorThrown) {
@@ -114,6 +115,12 @@ PUPPY.ajaxRefresher = (function () {
 
     });
   };
+  // var addNewPuppy = function(jsonArr){
+  //   $('#puppies-list').append('<li><b>'+jsonArr.name+'</b>'+ ' (' +
+  //                         jsonArr.breed_id+ '), created ' +
+  //                         new Date(Date.parse(jsonArr.created_at)) +
+  //                         '--' + '<a href=''>Adopt</a></li>');
+  // };
 
   var showSuccessAlert = function(message){
     $('#flash').removeClass('hidden alert-warning').addClass('alert-success').text(message);
