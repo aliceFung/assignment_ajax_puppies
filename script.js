@@ -8,7 +8,7 @@ PUPPY.ajaxRefresher = (function () {
     };
     $.ajax({
       method: "GET",
-      url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
+      url: "https://pacific-stream-9205.herokuapp.com/puppie.json",
       dataType: "json",
       contentType: "application/json",
       // header: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
@@ -22,7 +22,7 @@ PUPPY.ajaxRefresher = (function () {
       },
 
       complete: function(xhr) {
-        console.log("request complete")
+        console.log("request complete");
       }
 
     });
