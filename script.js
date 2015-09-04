@@ -8,10 +8,9 @@ PUPPY.ajaxRefresher = (function () {
     };
     $.ajax({
       method: "GET",
-      url: "https://pacific-stream-9205.herokuapp.com/puppie.json",
+      url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
       dataType: "json",
       contentType: "application/json",
-      // header: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
       async: true,
       success: function(json) {
         showListOfPuppies(json);
@@ -30,7 +29,8 @@ PUPPY.ajaxRefresher = (function () {
   };
 
   var alertUser = function(xhr, status, errorThrown) {
-    $("#flash").removeClass("hidden alert-success").addClass('alert-warning').text(status + ": " + errorThrown);
+    if (xhr.status == 0) errorThrown = "The specified page was not found";
+    $("#flash").removeClass("hidden alert-success").addClass('alert-warning').text(status + ": " + errorThrown).append("<button class='close' data-dismiss = 'alert'>&times;</button>");
   };
 
   var showListOfPuppies = function(json) {
@@ -40,7 +40,7 @@ PUPPY.ajaxRefresher = (function () {
       $("#puppies-list").append('<li><b>'+key+'</b>'+ ' (' +
                           info[key].breed + '), created ' +
                           new Date(Date.parse(info[key].found)) +
-                          '--' + '<a href='+ info[key].url +'>Adopt</a></li>');
+                          '--' + '<a class = "remove-puppy" href='+ info[key].url +'>Adopt</a></li>');
 
     }
   };
@@ -87,6 +87,34 @@ PUPPY.ajaxRefresher = (function () {
     }
   };
 
+  var adoptPuppy = function(event) {
+    event.preventDefault();
+    var element = event.target
+    var link = $(element).attr("href")
+    $.ajax({
+      type: "DELETE",
+      url: link,
+      dataType: "json",
+      contentType: "application/json",
+      headers: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
+      async: true,
+      success: function(jsonArr) {
+        showSuccessAlert('Puppy was successfully adopted!');
+        getPuppiesList();
+      },
+
+      error: function(xhr, status, errorThrown) {
+        alertUser(xhr, status, errorThrown);
+      },
+
+      complete: function(xhr) {
+        console.log("adoption request complete");
+      }
+
+    });
+
+  }
+
   var registerPuppy = function(event){
     event.preventDefault();
     var puppyName = $('#form input').val();
@@ -115,12 +143,6 @@ PUPPY.ajaxRefresher = (function () {
 
     });
   };
-  // var addNewPuppy = function(jsonArr){
-  //   $('#puppies-list').append('<li><b>'+jsonArr.name+'</b>'+ ' (' +
-  //                         jsonArr.breed_id+ '), created ' +
-  //                         new Date(Date.parse(jsonArr.created_at)) +
-  //                         '--' + '<a href=''>Adopt</a></li>');
-  // };
 
   var showSuccessAlert = function(message){
     $('#flash').removeClass('hidden alert-warning').addClass('alert-success').text(message);
@@ -132,6 +154,9 @@ PUPPY.ajaxRefresher = (function () {
     });
     $('body').on('click', '#register', function(event){
       registerPuppy(event);
+    });
+    $('body').on('click', '.remove-puppy', function(event){
+      adoptPuppy(event);
     });
   };
 
