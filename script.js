@@ -34,7 +34,6 @@ PUPPY.ajaxRefresher = (function () {
 
     myPromise.fail(function(){setLoadingFlash("Sorry, list failed to load", 'error')});
     clearTimeout(waiting);
-    setTimeout(function(){hideFlash();}, 2000);
   };
 
 
@@ -129,41 +128,46 @@ PUPPY.ajaxRefresher = (function () {
 
   var registerPuppy = function(event){
     event.preventDefault();
-    setLoadingFlash('Waiting...','warning');
-    var waiting = setTimeout(function(){setLoadingFlash('Sorry this is taking so long...', 'warning')},1000);
 
     var puppyName = $('#form input').val();
     var breedVal = $('#form select').val();
-    var request = $.ajax({
-      method: "POST",
-      url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
-      data: JSON.stringify({breed_id: breedVal, name: puppyName}),
-      dataType: "json",
-      contentType: "application/json",
-      headers: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
-      type: "POST",
-      async: true,
-      success: function(jsonArr) {
-        showSuccessAlert('Puppy is ready for adoption');
-        getPuppiesList();
-      },
+    if (puppyName){
+      setLoadingFlash('Waiting...','warning');
+      var waiting = setTimeout(function(){setLoadingFlash('Sorry this is taking so long...', 'warning')},1000);
+      var request = $.ajax({
+        method: "POST",
+        url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
+        data: JSON.stringify({breed_id: breedVal, name: puppyName}),
+        dataType: "json",
+        contentType: "application/json",
+        headers: { 'Access-Control-Allow-Origin': 'http://localhost:3000'},
+        type: "POST",
+        async: true,
+        success: function(jsonArr) {
+          showSuccessAlert('Puppy is ready for adoption');
+          getPuppiesList();
+        },
 
-      error: function(xhr, status, errorThrown) {
-        alertUser(xhr, status, errorThrown);
-      },
+        error: function(xhr, status, errorThrown) {
+          alertUser(xhr, status, errorThrown);
+        },
 
-      complete: function(xhr) {
-        console.log("breeds request complete");
-      }
+        complete: function(xhr) {
+          console.log("breeds request complete");
+        }
 
-    });
 
-    var myPromise = request.promise();
-    myPromise.done(function(){setLoadingFlash("Puppy List Refreshed!", 'success')});
+      });
 
-    myPromise.fail(function(){setLoadingFlash('error', 'danger')});
-    clearTimeout(waiting);
-    setTimeout(function(){hideFlash();}, 2000);
+      var myPromise = request.promise();
+      myPromise.done(function(){setLoadingFlash("Puppy List Refreshed!", 'success')});
+
+      // if (!puppyName) var msg = "Puppy needs a name"
+      myPromise.fail(function(){setLoadingFlash('error', 'danger')});
+      clearTimeout(waiting);
+    } else {
+      setLoadingFlash('Puppy Name is required to be present', 'danger');
+    }
   };
 
   var showSuccessAlert = function(message){
@@ -172,6 +176,7 @@ PUPPY.ajaxRefresher = (function () {
 
   var setLoadingFlash = function(msg, type){
     $("#flash").removeClass("hidden alert-success alert-warning").addClass('alert-' +type).text(msg);
+    setTimeout(function(){hideFlash();}, 2000);
   };
 
   var hideFlash = function(){
