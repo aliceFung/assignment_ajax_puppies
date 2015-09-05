@@ -3,10 +3,14 @@ var PUPPY = PUPPY || {};
 PUPPY.ajaxRefresher = (function () {
 
   var getPuppiesList = function (event) {
+    console.log('starting '+ Date.now());
     if (event) {
       event.preventDefault();
     };
-    $.ajax({
+    setLoadingFlash('Waiting...', 'warning');
+    var waiting = setTimeout(function(){setLoadingFlash('Sorry this is taking so long...');
+      console.log('waiting '+ Date.now());},1000);
+    var request = $.ajax({
       method: "GET",
       url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
       dataType: "json",
@@ -25,12 +29,19 @@ PUPPY.ajaxRefresher = (function () {
       }
 
     });
+    var myPromise = request.promise();
+    myPromise.done(function(){setLoadingFlash("Puppy List Refreshed!", 'success')});
 
+    myPromise.fail(function(){setLoadingFlash("Sorry, list failed to load", 'error')});
+    clearTimeout(waiting);
+    setTimeout(function(){hideFlash();}, 2000);
   };
+
+
 
   var alertUser = function(xhr, status, errorThrown) {
     if (xhr.status == 0) errorThrown = "The specified page was not found";
-    $("#flash").removeClass("hidden alert-success").addClass('alert-warning').text(status + ": " + errorThrown).append("<button class='close' data-dismiss = 'alert'>&times;</button>");
+    $("#flash").removeClass("hidden alert-success").addClass('alert-warning').text(status + ": " + errorThrown).append("<button class='close' id='close-flash'>&times;</button>");
   };
 
   var showListOfPuppies = function(json) {
@@ -89,9 +100,10 @@ PUPPY.ajaxRefresher = (function () {
 
   var adoptPuppy = function(event) {
     event.preventDefault();
+    setLoadingFlash();
     var element = event.target
     var link = $(element).attr("href")
-    $.ajax({
+    var request = $.ajax({
       type: "DELETE",
       url: link,
       dataType: "json",
@@ -117,9 +129,12 @@ PUPPY.ajaxRefresher = (function () {
 
   var registerPuppy = function(event){
     event.preventDefault();
+    setLoadingFlash('Waiting...','warning');
+    var waiting = setTimeout(function(){setLoadingFlash('Sorry this is taking so long...', 'warning')},1000);
+
     var puppyName = $('#form input').val();
     var breedVal = $('#form select').val();
-    $.ajax({
+    var request = $.ajax({
       method: "POST",
       url: "https://pacific-stream-9205.herokuapp.com/puppies.json",
       data: JSON.stringify({breed_id: breedVal, name: puppyName}),
@@ -142,10 +157,25 @@ PUPPY.ajaxRefresher = (function () {
       }
 
     });
+
+    var myPromise = request.promise();
+    myPromise.done(function(){setLoadingFlash("Puppy List Refreshed!", 'success')});
+
+    myPromise.fail(function(){setLoadingFlash('error', 'danger')});
+    clearTimeout(waiting);
+    setTimeout(function(){hideFlash();}, 2000);
   };
 
   var showSuccessAlert = function(message){
-    $('#flash').removeClass('hidden alert-warning').addClass('alert-success').text(message);
+    $('#flash').removeClass('hidden alert-warning').addClass('alert-success').text(message).append("<button class='close' id='close-flash'>&times;</button>");
+  };
+
+  var setLoadingFlash = function(msg, type){
+    $("#flash").removeClass("hidden alert-success alert-warning").addClass('alert-' +type).text(msg);
+  };
+
+  var hideFlash = function(){
+    $("#flash").removeClass("alert-success alert-warning").addClass('hidden'); //fadeout preferred
   };
 
   var setListener = function () {
@@ -157,6 +187,9 @@ PUPPY.ajaxRefresher = (function () {
     });
     $('body').on('click', '.remove-puppy', function(event){
       adoptPuppy(event);
+    });
+    $('body').on('click', '#close-flash', function(event){
+      $(event.target).parent().addClass('hidden');
     });
   };
 
